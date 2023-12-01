@@ -8,7 +8,7 @@ struct Day01: AdventDay {
     data.components(separatedBy: "\n")
   }
   
-  static var numbersRegex = Regex {
+  static var numbersRegex = Regex<Substring> {
     ChoiceOf {
       "one"
       "two"
@@ -24,7 +24,7 @@ struct Day01: AdventDay {
   }.anchorsMatchLineEndings()
   
   /// No lookbehind currently in Swift, so a hack
-  static var reversedNumbersRegex = Regex {
+  static var reversedNumbersRegex = Regex<Substring> {
     ChoiceOf {
       "eno"
       "owt"
@@ -39,18 +39,18 @@ struct Day01: AdventDay {
     }
   }.anchorsMatchLineEndings()
   
-  static func convert(_ string: String) -> Int? {
-    switch string {
-    case "one": 1
-    case "two": 2
-    case "three": 3
-    case "four": 4
-    case "five": 5
-    case "six": 6
-    case "seven": 7
-    case "eight": 8
-    case "nine": 9
-    default: Int(string)
+  static func convert(_ c: Substring) -> Int? {
+    switch c {
+    case "one", "eno": 1
+    case "two", "owt": 2
+    case "three", "eerht": 3
+    case "four", "ruof": 4
+    case "five", "evif": 5
+    case "six", "xis": 6
+    case "seven", "neves": 7
+    case "eight", "thgie": 8
+    case "nine", "enin": 9
+    default: c.first?.wholeNumberValue
     }
   }
 
@@ -72,18 +72,8 @@ struct Day01: AdventDay {
     return entities.reduce(
       into: 0,
       { (partial, next) in
-        let firstNumber: Int = if let result = next.firstMatch(of: regex) {
-          Day01
-            .convert(String(result.output)) ?? 0
-        } else {
-          0
-        }
-        let secondNumber: Int = if let result = String(next.reversed()).firstMatch(of: reversedRegex) {
-          Day01
-            .convert(String(result.output.reversed())) ?? 0
-          } else {
-            0
-          }
+        let firstNumber: Int = next.firstMatch(of: regex).flatMap { Day01.convert($0.output) } ?? 0
+        let secondNumber: Int = String(next.reversed()).firstMatch(of: reversedRegex).flatMap { Day01.convert($0.output) } ?? 0
         let number = firstNumber * 10 + secondNumber
         partial += number
       }
