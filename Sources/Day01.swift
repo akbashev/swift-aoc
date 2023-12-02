@@ -5,7 +5,7 @@ struct Day01: AdventDay {
   var data: String
 
   var entities: [String] {
-    data.components(separatedBy: "\n")
+    data.components(separatedBy: .newlines)
   }
   
   static var numbersRegex = Regex<Substring> {
