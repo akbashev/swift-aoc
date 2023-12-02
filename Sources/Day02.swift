@@ -42,7 +42,8 @@ struct Day02: AdventDay {
   static var gamesRegex = Regex {
     ChoiceOf {
       Regex {
-        "Game "
+        "Game"
+        OneOrMore(.whitespace)
         Capture {
           OneOrMore(.digit)
         }
