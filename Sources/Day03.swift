@@ -17,7 +17,11 @@ struct Day03: AdventDay {
   
   static var numbersRegex = Regex {
     OneOrMore(.digit)
-  }
+  }.anchorsMatchLineEndings()
+  
+  static var gearRegex = Regex {
+    "*"
+  }.anchorsMatchLineEndings()
   
   func part1() -> Any {
     let entities = self.entities
@@ -71,5 +75,67 @@ struct Day03: AdventDay {
     !line
       .filter { ($0.isWholeNumber || $0 == ".") == false }
       .isEmpty
+  }
+  
+  func part2() -> Any {
+    let entities = self.entities
+    let gearRegex = Day03.gearRegex
+    let numbersPerIndex = entities
+      .reduce(into: [Array<Regex<Substring>.Match>](), { $0.append(Day03.numberPatterns($1)) })
+    return entities
+      .enumerated()
+      .reduce(
+        into: [Int](),
+        { (partial, next) in
+          let (index, line) = next
+          for gear in line.matches(of: gearRegex) {
+            let start = {
+              if line.distance(from: line.startIndex, to: gear.startIndex) == 0 {
+                return gear.startIndex
+              }
+              return line.index(gear.startIndex, offsetBy: -1)
+            }()
+            let end = {
+              if line.distance(from: line.startIndex, to: gear.endIndex) == line.count {
+                return gear.endIndex
+              }
+              return line.index(gear.endIndex, offsetBy: +1)
+            }()
+            let range: Range<Substring.Index> = start..<end
+            
+            var numbers: [Int] = []
+            if index > 0 {
+              for number in (numbersPerIndex[index - 1]) {
+                if number.range.overlaps(range),
+                   let value = Int(number.0) {
+                  numbers.append(value)
+                }
+              }
+            }
+            for number in (numbersPerIndex[index]) {
+              if number.range.overlaps(range),
+                 let value = Int(number.0) {
+                numbers.append(value)
+              }
+            }
+            
+            if index < entities.count - 1 {
+              for number in (numbersPerIndex[index + 1]) {
+                if number.range.overlaps(range),
+                   let value = Int(number.0) {
+                  numbers.append(value)
+                }
+              }
+            }
+            
+            guard numbers.count == 2 else { continue }
+            partial.append(numbers[0]*numbers[1])
+          }
+        }
+      ).reduce(0, +)
+  }
+  
+  static func numberPatterns(_ line: String) -> Array<Regex<Substring>.Match> {
+    return line.matches(of: Day03.numbersRegex)
   }
 }
