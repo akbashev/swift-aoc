@@ -50,10 +50,8 @@ struct Day04: AdventDay {
           numbers = firstNumbers.filter(secondNumbers.contains)
         }
         partialResult[index, default: 0] += 1
-        for _ in 0..<(partialResult[index] ?? 1) {
-          for i in 0..<numbers.count {
-            partialResult[index + i + 1, default: 0] += 1
-          }
+        for i in 0..<numbers.count {
+          partialResult[index + i + 1, default: 0] += partialResult[index] ?? 1
         }
       }
       .reduce(into: 0, { $0 += $1.value })
