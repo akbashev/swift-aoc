@@ -28,7 +28,9 @@ let package = Package(
         .executableTarget(
             name: "AdventOfCode",
             dependencies: dependencies,
-            resources: [.copy("Data")]),
+            resources: [.copy("Data")],
+            swiftSettings: [.enableUpcomingFeature("BareSlashRegexLiterals")]
+        ),
         .testTarget(
             name: "AdventOfCodeTests",
             dependencies: ["AdventOfCode"] + dependencies
