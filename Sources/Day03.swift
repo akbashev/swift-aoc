@@ -1,6 +1,4 @@
 import Foundation
-import RegexBuilder
-
 
 struct Day03: AdventDay {
   var data: String
@@ -15,13 +13,8 @@ struct Day03: AdventDay {
       )
   }
   
-  static var numbersRegex = Regex {
-    OneOrMore(.digit)
-  }.anchorsMatchLineEndings()
-  
-  static var gearRegex = Regex {
-    "*"
-  }.anchorsMatchLineEndings()
+  static var numbersRegex = /\d+/
+  static var gearRegex = /\*/
   
   func part1() -> Any {
     let entities = self.entities
